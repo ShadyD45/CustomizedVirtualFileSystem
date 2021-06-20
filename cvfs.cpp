@@ -2,7 +2,6 @@
 #include<string.h>
 #include<stdlib.h>
 
-#include "globals.h"
 #include "cvfs.h"
 
 FileSystem :: FileSystem()
