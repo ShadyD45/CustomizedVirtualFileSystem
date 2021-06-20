@@ -5,8 +5,16 @@
 #include "globals.h"
 #include "cvfs.h"
 
+FileSystem :: FileSystem()
+{
+	Head = NULL;
+	// Intialize the file system
+	CreateDILB();
+	InitialiseSuperBlock();
+}
+
 // Check if file already exists or not
-bool FileExists(char *fname, PPINODE node)
+bool FileSystem :: FileExists(char *fname, PPINODE node)
 {
 	PINODE temp = Head;
 
@@ -40,7 +48,7 @@ bool FileExists(char *fname, PPINODE node)
 }
 
 // Get a Inode which does not represent a file
-PINODE GetFreeInode()
+PINODE FileSystem :: GetFreeInode()
 {
 	PINODE temp = Head;
 
@@ -57,7 +65,7 @@ PINODE GetFreeInode()
 }
 
 // Get File descriptor of given file
-int GetFDByName(char *fname)
+int FileSystem :: GetFDByName(char *fname)
 {
 	int i = 0;
 	while(i < UFDT_ARR_SIZE)
@@ -84,7 +92,7 @@ int GetFDByName(char *fname)
 }
 
 // Returns available File descriptor from UFDT
-int GetFreeFD()
+int FileSystem :: GetFreeFD()
 {
 	int i = 0;
 	
@@ -110,7 +118,7 @@ int GetFreeFD()
 }
 
 // Check READ permission
-bool HasReadPermission(int iFD)
+bool FileSystem :: HasReadPermission(int iFD)
 {
 	if((UFDTArr[iFD].ptrFileTable->iMode != READ) && (UFDTArr[iFD].ptrFileTable->iMode != READ+WRITE))
 	{
@@ -128,7 +136,7 @@ bool HasReadPermission(int iFD)
 }
 
 // Check WRITE permission
-bool HasWritePermission(int iFD)
+bool FileSystem :: HasWritePermission(int iFD)
 {
 	if((UFDTArr[iFD].ptrFileTable->iMode != WRITE) && (UFDTArr[iFD].ptrFileTable->iMode != READ+WRITE))
 	{
@@ -145,7 +153,7 @@ bool HasWritePermission(int iFD)
 	return true;
 }
 
-void man(char *fname)
+void FileSystem :: man(char *fname)
 {
 
 	if(fname == NULL) 
@@ -219,7 +227,7 @@ void man(char *fname)
 	}
 }
 
-void DisplayHelp()
+void FileSystem :: DisplayHelp()
 {
 	printf("\nls     : To List out all files\n");
  	printf("clear 	 : To clear console\n");
@@ -235,7 +243,7 @@ void DisplayHelp()
 	printf("exit 	 : To Terminate file system\n");
 }
 
-int stat_file(char *fname)
+int FileSystem :: stat_file(char *fname)
 {
 	PINODE temp = NULL;
 	int i = 0;
@@ -274,7 +282,7 @@ int stat_file(char *fname)
 }
 
 // Close all files
-void CloseAllFiles()
+void FileSystem :: CloseAllFiles()
 {
 	int i = 0;
 	for(i = 0; i < UFDT_ARR_SIZE; ++i)
@@ -292,7 +300,7 @@ void CloseAllFiles()
 }
 
 // Close specified file
-int CloseFile(char *fname)
+int FileSystem :: CloseFile(char *fname)
 {
 	int iFD = GetFDByName(fname);
 	if(iFD == -1)
@@ -311,7 +319,7 @@ int CloseFile(char *fname)
 }
 
 // Remove specified file
-int rm_file(char *fname)
+int FileSystem :: rm_file(char *fname)
 {
 	if(fname == NULL)
 	{
@@ -363,7 +371,7 @@ int rm_file(char *fname)
 }
 
 // List all files
-void ls_files()
+void FileSystem :: ls_files()
 {
 	int j = 0;
 	PINODE temp = Head;
@@ -384,7 +392,7 @@ void ls_files()
 }
 
 // Open given file with specified mode and return file descriptor
-int OpenFile(char *fname, int iMode)
+int FileSystem :: OpenFile(char *fname, int iMode)
 {
 	if(fname == NULL || iMode <= 0 || iMode > 3)
 	{
@@ -438,25 +446,13 @@ int OpenFile(char *fname, int iMode)
 	return iFD;
 }
 
-int ReadFile(int iFD, char *arr, int iSize)
+int FileSystem :: ReadFile(int iFD, char *arr, int iSize)
 {
 	if(UFDTArr[iFD].ptrFileTable == NULL)
 	{
 		// File not found
 		return -1;
 	}
-
-	// if((UFDTArr[iFD].ptrFileTable->iMode != READ) && (UFDTArr[iFD].ptrFileTable->iMode != READ+WRITE))
-	// {
-	// 	// Permission denied
-	// 	return -2;
-	// }
-
-	// if((UFDTArr[iFD].ptrFileTable->ptrInode->iPermission != READ) && (UFDTArr[iFD].ptrFileTable->ptrInode->iPermission != READ+WRITE))
-	// {
-	// 	// Permission denied
-	// 	return -2;
-	// }
 
 	if(!HasReadPermission(iFD))
 	{
@@ -498,20 +494,8 @@ int ReadFile(int iFD, char *arr, int iSize)
 	return iSize;
 }
 
-int WriteFile(int iFD, char *arr, int iSize)
+int FileSystem :: WriteFile(int iFD, char *arr, int iSize)
 {
-	// if((UFDTArr[iFD].ptrFileTable->iMode != WRITE) && (UFDTArr[iFD].ptrFileTable->iMode != READ+WRITE))
-	// {
-	// 	// Permission denied
-	// 	return -1;
-	// }
-
-	// if((UFDTArr[iFD].ptrFileTable->ptrInode->iPermission != WRITE) && (UFDTArr[iFD].ptrFileTable->ptrInode->iPermission != READ+WRITE))
-	// {
-	// 	// Permission denied
-	// 	return -1;
-	// }
-	
 	if(!HasWritePermission(iFD))
 	{
 		return -1;
@@ -542,7 +526,7 @@ int WriteFile(int iFD, char *arr, int iSize)
 }
 
 // Create a new file with specified permissions
-int CreateFile(char *fname, int iMode)
+int FileSystem :: CreateFile(char *fname, int iMode)
 {
 	int iFD  = 0;
 	if(fname == NULL || iMode == 0 || iMode > 3)
@@ -611,7 +595,7 @@ int CreateFile(char *fname, int iMode)
 }
 
 // Create DLIB with list of Inodes with default values
-void CreateDILB()
+void FileSystem :: CreateDILB()
 {
 	PINODE newn = NULL;
 	PINODE temp = Head;
@@ -644,7 +628,7 @@ void CreateDILB()
 }
 
 // Initiliase SuperBlock with default values
-void InitialiseSuperBlock()
+void FileSystem :: InitialiseSuperBlock()
 {
 	for(int i = 0; i < UFDT_ARR_SIZE; ++i)
 	{
