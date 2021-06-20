@@ -1,3 +1,4 @@
+// main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -33,10 +34,10 @@ int main()
 	while(1)
 	{
 		fflush(stdin);
-        strcpy(szStr,"");
-        
-        printf("\nVFS : >");
-        fgets(szStr, 80, stdin);
+		strcpy(szStr,"");
+
+		printf("\nVFS : >");
+		fgets(szStr, 80, stdin);
 		
 		iCount = sscanf(szStr,"%s %s %s %s",szCommand[0], szCommand[1], szCommand[2], szCommand[3]);
 		
