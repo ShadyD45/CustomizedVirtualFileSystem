@@ -26,169 +26,169 @@ int main()
 	char *ptr = NULL;
 	char szCommand[4][80];
 	int iCount = 0, iRet = 0, iFD = 0;
-
-	// Intialize the file system
-	CreateDILB();
-	InitialiseSuperBlock();
-
+	
+	FileSystem *objFS = new FileSystem();
+	
 	while(1)
 	{
 		fflush(stdin);
-		strcpy(szStr,"");
-
-		printf("\nVFS : >");
-		fgets(szStr, 80, stdin);
+        strcpy(szStr,"");
+        
+        printf("\nVFS : >");
+        fgets(szStr, 80, stdin);
 		
 		iCount = sscanf(szStr,"%s %s %s %s",szCommand[0], szCommand[1], szCommand[2], szCommand[3]);
 		
 		switch(iCount)
 		{
 			case 1: if(strcmp(szCommand[0], "ls") == 0)
-				{
-					ls_files();
-				}
-				else if(strcmp(szCommand[0], "exit") == 0)
-				{
-					printf("\nThank you for using Marvellous VFS\n");
-                			exit(0);
-				}
-				else if(strcmp(szCommand[0], "clear") == 0)
-				{
-					system("clear");
-				}
-				else if(strcmp(szCommand[0], "help") == 0)
-				{
-					DisplayHelp();
-				}
-				else if(strcmp(szCommand[0], "closeall") == 0)
-				{
-					CloseAllFiles();
-				}
-				else
-				{
-					printError(1);
-				}
-				break;
-
-			case 2: if(strcmp(szCommand[0], "rm") == 0)
-				{
-					iRet = rm_file(szCommand[1]);
-
-					if(iRet == 0)
 					{
-						printf("\nSUCCESS : File %s deleted successfully\n",szCommand[1]);
+						objFS->ls_files();
 					}
-					else if(iRet == -1)
+					else if(strcmp(szCommand[0], "exit") == 0)
 					{
-						printf("\nERROR: Invalid parameters to rm\n Use man rm for usage information");
+						printf("\nThank you for using Marvellous VFS\n");
+                		exit(0);
 					}
-					else if(iRet == -2)
+					else if(strcmp(szCommand[0], "clear") == 0)
 					{
-						printf("\nERROR: File %s not found", szCommand[1]);
+						system("clear");
 					}
-				}
-				else if(strcmp(szCommand[0], "man") == 0)
-				{
-					man(szCommand[1]);
-				}
-				else if(strcmp(szCommand[0], "write") == 0)
-				{
-					iFD = GetFDByName(szCommand[1]);
-						
-					if(iFD == -1)
+					else if(strcmp(szCommand[0], "help") == 0)
 					{
-						printf("\nError : Please open the file first\n");
+						objFS->DisplayHelp();
+					}
+					else if(strcmp(szCommand[0], "closeall") == 0)
+					{
+						objFS->CloseAllFiles();
 					}
 					else
 					{
-						printf("\nEnter data: ");
-						fgets(buffer, MAX_FILESIZE, stdin);		// scanf(" %[^\n]",buffer);
-						
-						iRet = strlen(buffer);
-						
+						printError(1);
+					}
+					break;
+
+			case 2: if(strcmp(szCommand[0], "rm") == 0)
+					{
+						iRet = objFS->rm_file(szCommand[1]);
+
 						if(iRet == 0)
 						{
-							printf("\nError : No data provided to write\n"); 
+							printf("\nSUCCESS : File %s deleted successfully\n",szCommand[1]);
+						}
+						else if(iRet == -1)
+						{
+							printf("\nERROR: Invalid parameters to rm\n Use man rm for usage information");
+						}
+						else if(iRet == -2)
+						{
+							printf("\nERROR: File %s not found", szCommand[1]);
+						}
+					}
+					else if(strcmp(szCommand[0], "man") == 0)
+					{
+						objFS->man(szCommand[1]);
+					}
+					else if(strcmp(szCommand[0], "write") == 0)
+					{
+						iFD = objFS->GetFDByName(szCommand[1]);
+						
+						if(iFD == -1)
+						{
+							printf("\nError : Please open the file first\n");
+
 						}
 						else
 						{
-							iRet = WriteFile(iFD, buffer, iRet);
-
-							if(iRet == -1)
+							printf("\nEnter data: ");
+							fgets(buffer, MAX_FILESIZE, stdin);		// scanf(" %[^\n]",buffer);
+						
+							iRet = strlen(buffer);
+						
+							if(iRet == 0)
 							{
-								printf("\nError : Permission Denied\n");
+								printf("\nError : No data provided to write\n"); 
+							}
+							else
+							{
+								iRet = objFS->WriteFile(iFD, buffer, iRet);
+
+								if(iRet == -1)
+								{
+									printf("\nError : Permission Denied\n");
+								}
 							}
 						}
 					}
-				}
-				else if(strcmp(szCommand[0], "close") == 0)
-				{
-					int iRet = CloseFile(szCommand[1]);
-					if(iRet == -1)
+					else if(strcmp(szCommand[0], "close") == 0)
 					{
-						printf("\nERROR : File %s not found or not open", szCommand[1]);
+						int iRet = objFS->CloseFile(szCommand[1]);
+						if(iRet == -1)
+						{
+							printf("\nERROR : File %s not found or not open", szCommand[1]);
+						}
+						else
+						{
+							printf("\nSUCCESS : File %s closed", szCommand[1]);
+						}
+					}
+					else if(strcmp(szCommand[0], "stat") == 0)
+					{
+						iRet = objFS->stat_file(szCommand[1]);
+						if(iRet == -1)
+						{
+							printf("\nERROR : Incorrect Parameters\n");
+						}	
+						else if(iRet == -2)
+						{
+							printf("\nERROR : File %s not found\n",szCommand[1]);
+						}
 					}
 					else
 					{
-						printf("\nSUCCESS : File %s closed", szCommand[1]);
+						printError(1);
 					}
-				}
-				else if(strcmp(szCommand[0], "stat") == 0)
-				{
-					iRet = stat_file(szCommand[1]);
-					if(iRet == -1)
-					{
-						printf("\nERROR : Incorrect Parameters\n");
-					}	
-					else if(iRet == -2)
-					{
-						printf("\nERROR : File %s not found\n",szCommand[1]);
-					}
-				}
-				else
-				{
-					printError(1);
-				}
-				break;
+					break;
 
-			case 3: if(strcmp(szCommand[0], "open") == 0)
-				{
-					// Syntax of open is open(fname, mode) so we passed fname and mode to our function
-					iRet = OpenFile(szCommand[1], atoi(szCommand[2]));
+			case 3: 
+					if(strcmp(szCommand[0], "open") == 0)
+					{
+						// Syntax of open is open(fname, mode) so we passed fname and mode to our function
+						iRet = objFS->OpenFile(szCommand[1], atoi(szCommand[2]));
 						
-					if(iRet >= 0)
-					{
-						printf("\nSUCCESS : File %s opened successfully with file descriptor: %d\n", szCommand[1], iRet);
+						if(iRet >= 0)
+						{
+							printf("\nSUCCESS : File %s opened successfully with file descriptor: %d\n", szCommand[1], iRet);
+						}
+						else if(iRet == -1)
+						{
+							printf("\nERROR : Invalid parameter values\n");
+						}
+						else if(iRet == -2)
+						{
+							printf("\nERROR : File %s doesn't exists\n", szCommand[1]);
+						}
+						else if(iRet == -3)
+						{
+							printf("\nERROR : Permission Denied\n");
+						}
+						else if(iRet == -4)
+						{
+							printf("\nERROR : No file descriptor available\n");
+						}
+						else if(iRet == -5)
+						{
+							printf("\nERROR : Memory allocation failure\n");
+						}
+						else
+						{
+							printf("\nSome error occured\n");
+						}
 					}
-					else if(iRet == -1)
+					else if(strcmp(szCommand[0], "create") == 0)
 					{
-						printf("\nERROR : Invalid parameter values\n");
-					}
-					else if(iRet == -2)
-					{
-						printf("\nERROR : File %s doesn't exists\n", szCommand[1]);
-					}
-					else if(iRet == -3)
-					{
-						printf("\nERROR : Permission Denied\n");
-					}
-					else if(iRet == -4)
-					{
-						printf("\nERROR : No file descriptor available\n");
-					}
-					else if(iRet == -5)
-					{
-						printf("\nERROR : Memory allocation failure\n");
-					}
-					else
-					{
-						printf("\nSome error occured\n");
-					}
-				}
-				else if(strcmp(szCommand[0], "create") == 0)
-				{
 						// Syntax of create is create(fname, mode) so we passed fname and mode to our function
-						iRet = CreateFile(szCommand[1], atoi(szCommand[2]));
+						iRet = objFS->CreateFile(szCommand[1], atoi(szCommand[2]));
 
 						if(iRet >= 0)
 						{
@@ -214,10 +214,10 @@ int main()
 						{
 							printf("\nERROR : Memory allocation failure\n");
 						}
-				}
-				else if(strcmp(szCommand[0], "read") == 0)
-				{
-						iFD = GetFDByName(szCommand[1]);
+					}
+					else if(strcmp(szCommand[0], "read") == 0)
+					{
+						iFD = objFS->GetFDByName(szCommand[1]);
 						
 						if(iFD == -1)
 						{
@@ -234,7 +234,7 @@ int main()
 							}
 						
 							// Syntax of read is read(fd, buff, size) so we passed fd, buff and size to our function
-							iRet = ReadFile(iFD, ptr, atoi(szCommand[2]));
+							iRet = objFS->ReadFile(iFD, ptr, atoi(szCommand[2]));
 
 							if(iRet > 0)
 							{
@@ -268,4 +268,5 @@ int main()
 		}
 	}
 	return 0;
+}return 0;
 }
