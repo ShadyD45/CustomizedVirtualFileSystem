@@ -329,6 +329,11 @@ int FileSystem :: CloseFile(char *fname)
 // Remove specified file
 int FileSystem :: rm_file(char *fname)
 {
+	if(NULL == fname)
+	{
+		// Invalid parameter
+		return -1;
+	}
 	PINODE temp = NULL;
 	
 	if(!FileExists(fname, &temp))
