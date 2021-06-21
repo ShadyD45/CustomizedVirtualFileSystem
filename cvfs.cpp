@@ -320,9 +320,10 @@ int FileSystem :: CloseFile(char *fname)
 	
 	UFDTArr[iFD].ptrFileTable->iReadOffset = 0;
 	UFDTArr[iFD].ptrFileTable->iWriteOffset = 0;
+	//UFDTArr[iFD].ptrFileTable->ptrInode = NULL;
 	(UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount)--;
 	// Free the FD for others use
-	UFDTArr[iFD].ptrFileTable = NULL;
+	//UFDTArr[iFD].ptrFileTable = NULL;
 	return 0;
 }
 
