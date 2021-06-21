@@ -329,13 +329,9 @@ int FileSystem :: CloseFile(char *fname)
 // Remove specified file
 int FileSystem :: rm_file(char *fname)
 {
-	if(fname == NULL)
-	{
-		// Invalid parameters
-		return -1;
-	}
-
-	if(!FileExists(fname))
+	PINODE temp = NULL;
+	
+	if(!FileExists(fname, &temp))
 	{
 		// File doesn't exists
 		return -2;
@@ -345,37 +341,36 @@ int FileSystem :: rm_file(char *fname)
 
 	if(iFD == -1)
 	{
-		// File not found
-		return -2;
+		(temp->iReferenceCount)--;
+		// If reference count is 0 after decrementing then remove file from inode table
+		if(temp->iReferenceCount <= 0)
+		{
+			// FileType 0 indicates file deleted from HDD
+			temp->iFileType = 0;
+			// Increase count of free nodes by 1 after deleting
+			(SuperBlockObj.iFreeInodes)++;
+		}
 	}
-
-	// Decrement the reference count from inode table
-	(UFDTArr[iFD].ptrFileTable->ptrInode->iLinkCount)--;
-	
-	// If reference count is 0 after decrementing then remove file from inode table
-	if((UFDTArr[iFD].ptrFileTable->ptrInode->iLinkCount) == 0)
-	{	
-		UFDTArr[iFD].ptrFileTable->ptrInode->iFileType = 0;
-		free(UFDTArr[iFD].ptrFileTable);
+	else
+	{
+		// Decrement the reference count from inode table
+		(UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount)--;
+		
+		// If reference count is 0 after decrementing then remove file from inode table
+		if((UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount) <= 0)
+		{	
+			UFDTArr[iFD].ptrFileTable->ptrInode->iFileType = 0;
+			free(UFDTArr[iFD].ptrFileTable);
+			// Increase count of free nodes by 1 after deleting
+			(SuperBlockObj.iFreeInodes)++;
+		}
+		
+		UFDTArr[iFD].ptrFileTable = NULL;
+		
 	}
-	
-	UFDTArr[iFD].ptrFileTable = NULL;
-	
-	// Increase count of free nodes by 1 after deleting
-	(SuperBlockObj.iFreeInodes)++;
 
 	// File deleted Successfully
 	return 0;
-	/*
-	// Decrement the reference count from inode table
-	(UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount)--;
-	
-	// If reference count is 0 after decrementing then remove file from inode table
-	if((UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount) == 0)
-	{	
-		UFDTArr[iFD].ptrFileTable->ptrInode->iFileType = 0;
-	}
-	*/
 }
 
 // List all files
