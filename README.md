@@ -5,7 +5,7 @@
     manage File system oriented tasks.
  
 # About
-  - In this project we create all data structures which required for File Subsystems such as
+  - In this project we create all data structures which are required for File Subsystems such as
     Inode Table, File Table, UAREA, User File Descriptor Table, Super block, Disk Inode List Block, Data Block, Boot Block etc.
   - As the name suggest its virtual because we maintain all records in Primary storage.
   - We provide all implementations of necessary system calls and commands of File subsystem such as 
