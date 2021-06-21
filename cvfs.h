@@ -24,7 +24,8 @@ class FileSystem
 		// --------------- Utility Functions ------------------ //
 	
 		FileSystem();			// Constructor
-	
+		~FileSystem();			// Destructor
+		
 		// --------------- File System Functions --------------- //
 		void CloseAllFiles();
 		int CloseFile(char *);

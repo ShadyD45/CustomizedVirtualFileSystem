@@ -12,6 +12,16 @@ FileSystem :: FileSystem()
 	InitialiseSuperBlock();
 }
 
+FileSystem :: ~FileSystem()
+{
+	// Free up allocated memory
+	while(NULL != Head)
+	{
+		PINODE Target = Head;
+		Head = Head->next;
+		free(Target);
+	}
+}
 // Check if file already exists or not
 bool FileSystem :: FileExists(char *fname, PPINODE node)
 {
@@ -329,7 +339,7 @@ int FileSystem :: rm_file(char *fname)
 	if(!FileExists(fname))
 	{
 		// File doesn't exists
-		return -3;
+		return -2;
 	}
 
 	int iFD = GetFDByName(fname);
