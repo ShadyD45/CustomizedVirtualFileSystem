@@ -19,12 +19,12 @@ class FileSystem
 		
 	
 	public:
-		FileSystem();			// Constructor
 		void DisplayHelp();
 		int GetFDByName(char *);
 		// --------------- Utility Functions ------------------ //
-
-
+	
+		FileSystem();			// Constructor
+	
 		// --------------- File System Functions --------------- //
 		void CloseAllFiles();
 		int CloseFile(char *);
