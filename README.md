@@ -20,6 +20,6 @@
 	 	g++ cvfs.cpp main.cpp -o Main
 	 ```
   3) Once you compile all the necessary files, Run the project using using below command.
-  	```
+  	 ```
 	 	./Main
-	  ```
+	 ```
