@@ -46,7 +46,7 @@ int main()
 					}
 					else if(strcmp(szCommand[0], "exit") == 0)
 					{
-						printf("\nThank you for using Marvellous VFS\n");
+						printf("\nThank you for using CVFS\n");
                 		exit(0);
 					}
 					else if(strcmp(szCommand[0], "clear") == 0)
