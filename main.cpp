@@ -220,7 +220,7 @@ int main()
 						
 						if(iFD == -1)
 						{
-							printf("\nError : Incorrect parameter\n"); 
+							printf("\nERROR : File does not exists\n"); 
 						}
 						else
 						{
