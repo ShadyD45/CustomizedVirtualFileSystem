@@ -100,7 +100,7 @@ int FileSystem :: GetFDByName(char *fname)
 	}
 }
 
-// Returns available File descriptor iFrom UFDT
+// Returns available File descriptor from UFDT
 int FileSystem :: GetFreeFD()
 {
 	int i = 0;
@@ -177,7 +177,7 @@ void FileSystem :: man(char *fname)
 	}
 	else if(strcmp(fname,"read") == 0)
 	{
-		printf("Description : Used to read data iFrom regular file\n");
+		printf("Description : Used to read data from regular file\n");
 		printf("Usage : read File_name No_Of_Bytes_To_Read\n");
 	}
 	else if(strcmp(fname,"write") == 0)
@@ -202,13 +202,13 @@ void FileSystem :: man(char *fname)
 	}
 	else if(strcmp(fname,"truncate") == 0)
 	{
-		printf("Description : Used to remove data iFrom file\n");
+		printf("Description : Used to remove data from file\n");
 		printf("Usage : truncate File_name\n");
 	}
 	else if(strcmp(fname,"open") == 0)
 	{
 		printf("Description : Used to open existing file\n");
-		printf("Usage : open File_name iMode\n");
+		printf("Usage : open File_name mode\n");
 	}
 	else if(strcmp(fname,"close") == 0)
 	{
@@ -241,14 +241,14 @@ void FileSystem :: DisplayHelp()
 	printf("\nls     : To List out all files\n");
  	printf("clear 	 : To clear console\n");
  	printf("open 	 : To open the file\n");
- 	printf("read 	 : To Read the contents iFrom file\n");
+ 	printf("read 	 : To Read the contents from file\n");
 	printf("write 	 : To Write contents into file\n");
 	printf("rm       : To Delete the file\n");
  	printf("close 	 : To close the file\n");
 	printf("closeall : To close all opened files\n");
 	printf("stat 	 : To Display information of file using name\n");
 	printf("fstat 	 : To Display information of file using file descriptor\n");
-	printf("truncate : To Remove all data iFrom file\n");
+	printf("truncate : To Remove all data from file\n");
 	printf("exit 	 : To Terminate file system\n");
 }
 
@@ -272,8 +272,8 @@ int FileSystem :: stat_file(char *fname)
 	printf("\n---------Statistical Information about file----------\n");
 	printf("File name : %s\n",temp->szFileName);
 	printf("Inode Number %d\n",temp->iInodeNo);
-	printf("File iSize : %d\n",temp->iFileSize);
-	printf("Actual File iSize : %d\n",temp->iActualFileSize);
+	printf("File size : %d\n",temp->iFileSize);
+	printf("Actual File Size : %d\n",temp->iActualFileSize);
 	printf("Link count : %d\n",temp->iLinkCount);
 	printf("Reference count : %d\n",temp->iReferenceCount);
 	if(temp->iPermission == READ){
@@ -347,10 +347,10 @@ int FileSystem :: rm_file(char *fname)
 	if(iFD == -1)
 	{
 		(temp->iReferenceCount)--;
-		// If reference count is 0 after decrementing then remove file iFrom inode table
+		// If reference count is 0 after decrementing then remove file from inode table
 		if(temp->iReferenceCount <= 0)
 		{
-			// FileType 0 indicates file deleted iFrom HDD
+			// FileType 0 indicates file deleted from HDD
 			temp->iFileType = 0;
 			// Increase count of free nodes by 1 after deleting
 			(SuperBlockObj.iFreeInodes)++;
@@ -358,10 +358,10 @@ int FileSystem :: rm_file(char *fname)
 	}
 	else
 	{
-		// Decrement the reference count iFrom inode table
+		// Decrement the reference count from inode table
 		(UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount)--;
 		
-		// If reference count is 0 after decrementing then remove file iFrom inode table
+		// If reference count is 0 after decrementing then remove file from inode table
 		if((UFDTArr[iFD].ptrFileTable->ptrInode->iReferenceCount) <= 0)
 		{	
 			UFDTArr[iFD].ptrFileTable->ptrInode->iFileType = 0;
@@ -512,7 +512,7 @@ void FileSystem :: ls_files()
     }
 }
 
-// Open given file with specified iMode and return file descriptor
+// Open given file with specified mode and return file descriptor
 int FileSystem :: OpenFile(char *fname, int iMode)
 {
 	if(fname == NULL || iMode <= 0 || iMode > 3)
@@ -592,7 +592,7 @@ int FileSystem :: ReadFile(int iFD, char *arr, int iSize)
 		return -3;
 	}
 
-	// Check if given iSize doesn't exceed actual file iSize
+	// Check if given size doesn't exceed actual file size
 	// else the garbage values will be displayed to the user
 	int iRead_Size = (UFDTArr[iFD].ptrFileTable->ptrInode->iActualFileSize) - (UFDTArr[iFD].ptrFileTable->iReadOffset);
 
@@ -606,7 +606,7 @@ int FileSystem :: ReadFile(int iFD, char *arr, int iSize)
 	}
 	else
 	{
-		// Read iSize bytes into given array
+		// Read size bytes into given array
 		strncpy(arr, (UFDTArr[iFD].ptrFileTable->ptrInode->buffer + UFDTArr[iFD].ptrFileTable->iReadOffset), iSize);
 		// Change read offset in the file table
 		UFDTArr[iFD].ptrFileTable->iReadOffset = UFDTArr[iFD].ptrFileTable->iReadOffset + iSize;
@@ -639,7 +639,7 @@ int FileSystem :: WriteFile(int iFD, char *arr, int iSize)
 	// Increase write offset
 	UFDTArr[iFD].ptrFileTable->iWriteOffset = UFDTArr[iFD].ptrFileTable->iWriteOffset + iSize;
 
-	// Change actual file iSize
+	// Change actual file size
 	UFDTArr[iFD].ptrFileTable->ptrInode->iActualFileSize = UFDTArr[iFD].ptrFileTable->ptrInode->iActualFileSize + iSize;
 
 	// Return number of bytes written to file
@@ -672,7 +672,7 @@ int FileSystem :: CreateFile(char *fname, int iMode)
 	// Get a Free Inode
 	PINODE inode = GetFreeInode();
 
-	// Get an available file decriptor iFrom UFDT
+	// Get an available file decriptor from UFDT
 	iFD = GetFreeFD();
 
 	if(iFD == -1)
