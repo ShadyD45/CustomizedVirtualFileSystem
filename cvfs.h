@@ -37,6 +37,7 @@ class FileSystem
 		int ReadFile(int, char *, int);
 		int WriteFile(int, char *, int);
 		int CreateFile(char *, int);
+		int LseekFile(int, int, int);
 		void CreateDILB();
 		void InitialiseSuperBlock();
 		// --------------- File System Functions --------------- //

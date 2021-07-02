@@ -260,6 +260,26 @@ int main()
 					break;
 			
 			case 4: 
+					if(strcmp(szCommand[0],"lseek") == 0)
+					{
+						iFD = objFS->GetFDByName(szCommand[1]);
+						if(iFD == -1)
+						{
+					 		printf("Error : Incorrect parameter\n"); 
+					 		continue;
+						}
+						
+						iRet = objFS->LseekFile(iFD, atoi(szCommand[2]),atoi(szCommand[3]));
+						
+						if(iRet == -1)
+						{
+							printf("ERROR : Unable to perform lseek\n");
+						}
+					}
+					else
+					{
+						printf("\nERROR : Command not found !!!\n”); continue");
+					}
 					break;
 
 			default: printf("Error: Bad command default");
